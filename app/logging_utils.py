@@ -43,4 +43,4 @@ def log_event(event: str, level: str = "info", **fields) -> str:
     log_line = json.dumps(record, ensure_ascii=False)
     print(log_line, file=sys.stdout)
     return log_line
-    
+  

@@ -1,4 +1,4 @@
-# CP5 — Cấu hình deploy Railway (dùng nếu bạn chọn Railway).
+# CP5 — Cấu hình deploy Railway.
 #
 # Các biến môi trường KHÔNG khai báo ở đây. Đặt chúng trong dashboard hoặc:
 #     railway variables --set AGENT_API_KEY=...
@@ -6,7 +6,7 @@
 # Railway tự gán biến PORT — app phải đọc $PORT, đừng cố định 8000.
 
 [build]
-builder = "dockerfile"
+builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]

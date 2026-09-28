@@ -13,6 +13,7 @@ import json
 import redis
 
 from .config import get_settings
+from .logging_utils import log_event
 
 HISTORY_MAX_MESSAGES = 20
 HISTORY_TTL_SECONDS = 7 * 24 * 3600
@@ -54,8 +55,21 @@ class ConversationStore:
         try:
             self.client.ping()
             return True
-        except Exception:
+        except Exception as exc:
+            # KHÔNG để exception thoát ra (readiness phải trả 503 chứ không
+            # sập), nhưng vẫn ghi log kèm host để biết đang trỏ nhầm đâu.
+            log_event("redis_ping_failed", **self._describe(exc))
             return False
+
+    def _describe(self, exc: Exception) -> dict:
+        """Thông tin chẩn đoán khi không nối được Redis (host + lỗi)."""
+        pool = getattr(self.client, "connection_pool", None)
+        kwargs = getattr(pool, "connection_kwargs", {}) or {}
+        return {
+            "target": f"{kwargs.get('host')}:{kwargs.get('port')}",
+            "error": type(exc).__name__,
+            "detail": str(exc),
+        }
 
     def append(self, user_id: str, role: str, content: str) -> None:
         """Ghi thêm một lượt vào lịch sử.
